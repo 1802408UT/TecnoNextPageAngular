@@ -1,0 +1,12 @@
+<mat-drawer-container>
+    <mat-drawer #sidenav mode="side" [(opened)]="opened">
+        <mat-toolbar color="primary">Menu</mat-toolbar>
+        <app-sidebar></app-sidebar>
+    </mat-drawer>
+    <mat-drawer-content>
+        <app-header (toggleSidenav)="sidenav.toggle()"></app-header>
+        <div class="space"></div>
+        <router-outlet></router-outlet>
+        <app-footer></app-footer>
+    </mat-drawer-content>
+</mat-drawer-container>

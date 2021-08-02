@@ -1,0 +1,38 @@
+<header id="header" class="fixed-top">
+    <div class="container-fluid d-flex">
+
+        <div class="logo mr-auto">
+            <h1 class="text-light"><a><span>Tecno - Next</span></a></h1>
+            <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+        </div>
+
+        <nav class="nav-menu d-none d-lg-block">
+            <ul>
+                <li class="active"><a routerLink="/" routerLinkActive="active">Inicio</a></li>
+                <li><a routerLink="/about">Acerca de Nosotros</a></li>
+                <li><a routerLink="/servicios">Servicios</a></li>
+                <li><a routerLink="/products-list">Productos</a></li>
+                <li><a routerLink="/team">Equipo</a></li>
+                <li *ngIf="isAdmin === 'admin'" class="drop-down"><a href="">Drop Down</a>
+                    <ul>
+                        <li><a (click)="onToggleSidenav()">Menu</a></li>
+                        <li><a href="#">Drop Down 3</a></li>
+                        <li><a *ngIf="isAdmin === 'admin'" mat-button routerLink="/admin">Admin</a></li>
+                        <li><a (click)="onLogout()">Logout</a></li>
+                    </ul>
+                </li>
+                <li><a routerLink="/contacto">Contáctanos</a></li>
+                <div *ngIf="(authSvc.user$ | async) as user; then thenBlock else elseBlock"></div>
+                <ng-template #thenBlock>
+                    <li class="get-started"><a (click)="onLogout()">Cerrar Sesión</a></li>
+                </ng-template>
+                <ng-template #elseBlock>
+                    <li class="get-started"><a routerLink="/login">Inicia Sesión</a></li>
+                </ng-template>
+            </ul>
+        </nav>
+        <!-- .nav-menu -->
+
+    </div>
+
+</header>
