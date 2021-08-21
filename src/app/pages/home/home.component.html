@@ -1,40 +1,110 @@
 <ng-container *ngIf="(authSvc.user$ | async) as user">
-    <h1 class="w3-container">Bienvenido, {{ user?.username || 'User' }}.</h1>
-    <!--
-    <div class="w3-container">
+    <div class="w3-padding-top-64">
+        <h1 class="w3-container">Bienvenido, {{ user?.username || 'User' }}.</h1>
+        <!--
+        <div class="w3-container">
 
-        <mat-table class="w3-table-all w3-card-4" matTableExporter [dataSource]="dataSource" #exporter="matTableExporter" [hiddenColumns]="[0]">
+            <mat-table class="w3-table-all w3-card-4" matTableExporter [dataSource]="dataSource" #exporter="matTableExporter" [hiddenColumns]="[0]">
 
-            <ng-container matColumnDef="position">
-                <mat-header-cell *matHeaderCellDef> No. </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.position}} </mat-cell>
-            </ng-container>
+                <ng-container matColumnDef="id">
+                    <mat-header-cell *matHeaderCellDef> Id. </mat-header-cell>
+                    <mat-cell *matCellDef="let products"> {{products.id}} </mat-cell>
+                </ng-container>
 
-            <ng-container matColumnDef="name">
-                <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
-            </ng-container>
+                <ng-container matColumnDef="name">
+                    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+                    <mat-cell *matCellDef="let products"> {{products.name}} </mat-cell>
+                </ng-container>
 
-            <ng-container matColumnDef="surname">
-                <mat-header-cell *matHeaderCellDef> Surname </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.surname}} </mat-cell>
-            </ng-container>
+                <ng-container matColumnDef="price">
+                    <mat-header-cell *matHeaderCellDef> Surname </mat-header-cell>
+                    <mat-cell *matCellDef="let products"> {{products.price}} </mat-cell>
+                </ng-container>
 
-            <ng-container matColumnDef="birth">
-                <mat-header-cell *matHeaderCellDef> Birth </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.birth}} </mat-cell>
-            </ng-container>
+                <ng-container matColumnDef="description">
+                    <mat-header-cell *matHeaderCellDef> Birth </mat-header-cell>
+                    <mat-cell *matCellDef="let products"> {{products.description}} </mat-cell>
+                </ng-container>
 
-            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-        </mat-table>
+                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+            </mat-table>
 
-    </div>
-    <button mat-raised-button (click)="exporter.exportTable('xlsx', {fileName:'test', sheet: 'sheet_name', Props: {Author: 'Talha'}})">Excel</button>
-    <button mat-raised-button (click)="exporter.exportTable('csv')">Csv</button>
-    <button mat-raised-button (click)="exporter.exportTable('json')">Json</button>
-    <button mat-raised-button (click)="exporter.exportTable('txt')">Txt</button>
+        </div>
+        <button mat-raised-button (click)="exporter.exportTable('xlsx', {fileName:'test', sheet: 'sheet_name', Props: {Author: 'Talha'}})">Excel</button>
+        <button mat-raised-button (click)="exporter.exportTable('csv')">Csv</button>
+        <button mat-raised-button (click)="exporter.exportTable('json')">Json</button>
+        <button mat-raised-button (click)="exporter.exportTable('txt')">Txt</button>
 -->
+    </div>
+    <!--
+    <div class="w3-container w3-padding-64">
+        <app-excel-import></app-excel-import>
+    </div>
+-->
+    <div class="w3-container w3-padding-64">
+        <h1>Sube Archivo</h1>
+        <div id="wrap">
+            <mat-card id="box1">
+                <div mode="buffer" *ngFor="let progress of progressInfo">
+                    <span>{{progress.fileName}}</span>
+                    <span>{{progress.value}}%</span>
+                    <div id="progressbar">
+                        <mat-progress-bar mode="buffer" value={{progress.value}}>
+                        </mat-progress-bar>
+                    </div>
+                </div>
+            </mat-card>
+            <div id="box2">
+                <button id="selectButton" mat-raised-button (click)="fileInput.click()">Select File to Upload</button>
+
+                <input #fileInput type="file" name="avatar" hidden multiple (change)="selectFiles($event)" />
+                <span *ngIf="fileName">{{fileName}}</span>
+
+                <button id="uploadButton" mat-raised-button *ngIf="selectedFiles" [disabled]="!selectedFiles" (click)="uploadFiles()">
+                    Subir Archivos
+                </button>
+            </div>
+
+            <div id="box3">
+                <span>{{message}}</span>
+            </div>
+
+            <div id="box4">
+                <mat-card>
+                    <mat-card-header>
+                        <mat-card-title>Lista de Archivos</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <ul>
+
+                            <li *ngFor="let file of fileInfos | async; index as fileId">
+                                <a>{{file.$loki}}</a>
+                                <a>{{file.originalname}}</a>
+                                <a>{{file.filename}}</a>
+                                <a mat-button href="http://localhost:3000/upload/load/{{file.$loki}}" target="_blank">
+                                    <mat-icon (click)="getById(file.$loki)">get_app</mat-icon>
+                                </a>
+                                <div *ngIf="isUser === 'admin'; then thenBlock else elseBlock"></div>
+                                <ng-template #thenBlock>
+                                    <button mat-button>
+                                        <mat-icon (click)="deleteFile(file.$loki)">delete</mat-icon>
+                                    </button>
+                                </ng-template>
+                                <ng-template #elseBlock>
+                                    <button mat-button disabled>
+                                        <mat-icon (click)="deleteFile(file.$loki)">delete</mat-icon>
+                                    </button>
+                                </ng-template>
+                            </li>
+                        </ul>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+
+
 </ng-container>
 
 <ng-container *ngIf="!isUser">
@@ -354,7 +424,7 @@
                     </div>
 
                     <div class="col-lg-7 mt-lg-0 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="200">
-                        <form action="forms/contact.php" method="post" role="form" class="php-email-form">
+                        <form role="form" class="php-email-form">
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="name">Your Name</label>

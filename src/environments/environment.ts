@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   API_URL: 'http://localhost:3000',
+  APIUploadUrl: 'http://localhost:3000/upload'
 };
 
 /*

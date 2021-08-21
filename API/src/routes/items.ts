@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import ItemsController from '../controller/ItemController';
+import { checkJwt } from '../middlewares/jwt';
+
 
 const router = Router();
 
@@ -10,12 +12,12 @@ router.get('/', ItemsController.getAll);
 router.get('/:id', ItemsController.getById);
 
 // Create a new item
-router.post('/',  ItemsController.newItem);
+router.post('/', ItemsController.newItem);
 
 // Edit item
-router.patch('/:id',  ItemsController.editItem);
+router.patch('/:id', ItemsController.editItem);
 
 // Delete
-router.delete('/:id',  ItemsController.deleteItem);
+router.delete('/:id', ItemsController.deleteItem);
 
 export default router;

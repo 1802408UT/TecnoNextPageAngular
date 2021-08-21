@@ -4,12 +4,12 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { AuthService } from '@auth/auth.service';
 import { takeUntil } from 'rxjs/operators';
-import { products } from '@pages/home/products';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
+import {products} from '@app/pages/home/products';
+import {UploadFilesService} from '@admin/admin/services/upload.service'
+import { HttpEventType, HttpResponse } from '@angular/common/http';
 
 
 @Component({
@@ -18,20 +18,29 @@ import { MatPaginator } from '@angular/material/paginator';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
+  elementData = products;
+    //Lista de archivos seleccionados
+    selectedFiles: FileList;
+    //Es el array que contiene los items para mostrar el progreso de subida de cada archivo
+    progressInfo = []
+    //Mensaje que almacena la respuesta de las Apis
+    message = '';
+    //Nombre del archivo para usarlo posteriormente en la vista html
+    fileName = "";
+    fileInfos: Observable<any>;
   
-  title = 'mte-test';
-  displayedColumns = ['position', 'name', 'surname', 'birth'];
-  
-  dataSource: MatTableDataSource<Element>;
-
+  displayedColumns: string[] = ['id', 'name', 'price', 'description'];
+  dataSource = this.elementData;
+  data;
   isUser = null;
   isAdmin = null;
   isLogged = false;
 
 
   private destroy$ = new Subject<any>();
+  
 
-  constructor(public authSvc: AuthService) {}
+  constructor(public authSvc: AuthService, private uploadSrv: UploadFilesService) {}
   
   
 
@@ -41,8 +50,10 @@ export class HomeComponent implements OnInit {
       .subscribe((user: UserResponse) => {
         this.isLogged = true;
         this.isUser = user?.role;
+        
       });
-      this.dataSource = new MatTableDataSource<Element>(ELEMENT_DATA);
+   
+      this.fileInfos = this.uploadSrv.getFiles();
       
     }
   ngOnDestroy(): void {
@@ -50,30 +61,45 @@ export class HomeComponent implements OnInit {
     this.destroy$.complete();
   }
 
-}
+  selectFiles(event) {
+    this.progressInfo = [];
+    //Validación para obtener el nombre del archivo si es uno solo
+    //En caso de que sea >1 asigna a fileName length
+    event.target.files.length == 1 ? this.fileName = event.target.files[0].name : this.fileName = event.target.files.length + " archivos";
+    this.selectedFiles = event.target.files;
+  }
 
-export interface Element {
-  name: string;
-  position: number;
-  surname: string;
-  birth: string;
-}
+  uploadFiles() {
+    this.message = '';
+    for (let i = 0; i < this.selectedFiles.length; i++) {
+      this.upload(i, this.selectedFiles[i]);
+    }
+    
+  }
+  upload(index, file) {
+    this.progressInfo[index] = { value: 0, fileName: file.name };
 
-const ELEMENT_DATA: Element[] = [
-  {position: 1, name: 'Albert', surname: 'Einstein', birth: '1879'},
-  {position: 2, name: 'Marie', surname: 'Curie', birth: '1867'},
-  {position: 3, name: 'Enrico', surname: 'Fermi', birth: '1901'},
-  {position: 4, name: 'Dmitri', surname: 'Mendeleev', birth: '1834'},
-  {position: 5, name: 'Alfred', surname: 'Nobel', birth: '1833'},
-  {position: 6, name: 'Ernest', surname: 'Lawrence', birth: '1901'},
-  {position: 7, name: 'Glenn', surname: 'Seaborg', birth: '1912'},
-  {position: 8, name: 'Niels', surname: 'Bohr', birth: '1885'},
-  {position: 9, name: 'Lise', surname: 'Meitner', birth: '1878'},
-  {position: 10, name: 'Wilhelm', surname: 'Röntgen', birth: '1845'},
-  {position: 11, name: 'Nicolaus', surname: 'Copernicus', birth: '1473'},
-  {position: 12, name: 'Georgy', surname: 'Flyorov', birth: '1913'},
-  {position: 13, name: 'Yuri', surname: 'Oganessian', birth: '1933'},
-  {position: 14, name: 'Johan', surname: 'Gadolin', birth: '1760'},
-  {position: 15, name: 'Pierre', surname: 'Curie', birth: '1859'},
-];
+    this.uploadSrv.upload(file).subscribe(
+      event => {
+        if (event.type === HttpEventType.UploadProgress) {
+          this.progressInfo[index].value = Math.round(100 * event.loaded / event.total);
+        } else if (event instanceof HttpResponse) {
+          this.fileInfos = this.uploadSrv.getFiles();
+        }
+      },
+      err => {
+        this.progressInfo[index].value = 0;
+        this.message = 'Actualice para comprobar que el archivo '+ file.name+' se haya subido.';
+      });
+  }
+
+  getById(id:number){
+
+    this.data = this.uploadSrv.getFile(id);
+
+
+  }
+
+
+}
 

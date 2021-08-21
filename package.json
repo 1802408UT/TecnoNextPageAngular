@@ -24,10 +24,13 @@
     "@angular/platform-browser-dynamic": "~11.2.14",
     "@angular/router": "~11.2.14",
     "@auth0/angular-jwt": "^5.0.1",
+    "axios": "^0.21.1",
     "concurrently": "^5.2.0",
     "mat-table-exporter": "^10.2.3",
+    "ngx-papaparse": "^5.0.0",
     "rxjs": "~6.5.5",
     "tslib": "^2.0.0",
+    "xlsx": "^0.16.9",
     "zone.js": "~0.10.3"
   },
   "devDependencies": {

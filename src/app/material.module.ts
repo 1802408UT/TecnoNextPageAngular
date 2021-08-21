@@ -15,6 +15,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTableExporterModule } from 'mat-table-exporter';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatGridListModule} from '@angular/material/grid-list';
 
 
 
@@ -34,7 +36,9 @@ const myModules = [
   MatSelectModule,
   MatTableExporterModule,
   MatPaginatorModule,
-  MatFormFieldModule
+  MatFormFieldModule,
+  MatProgressBarModule,
+  MatGridListModule
 ];
 
 @NgModule({
